@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Jetson’s Journey — An Interactive Map</title>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZQLVEN820R"></script>
+<script>
+window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
+gtag('js',new Date());gtag('config','G-ZQLVEN820R');
+function ga(ev,params){try{gtag('event',ev,params||{})}catch(e){}}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650&family=Crimson+Pro:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
@@ -576,6 +582,7 @@ var STATE_LABELS=[["AL",32.62,-86.68],["AZ",34.16,-111.93],["CO",39,-105.55],["F
     if(i<0 || i>=STEPS.length) return;
     current=i; inTour=true;
     var s=STEPS[i];
+    ga("stop_tap",{item_name:s.title,item_id:s.id,method:fromPin?"pin":"tour"});
     if(reduceMotion){ map.setView([s.lat,s.lng], s.zoom); }
     else{ map.flyTo([s.lat,s.lng], s.zoom, {duration: fromPin?0.9:1.6}); }
     renderCard(s);
@@ -587,6 +594,7 @@ var STATE_LABELS=[["AL",32.62,-86.68],["AZ",34.16,-111.93],["CO",39,-105.55],["F
   }
 
   function enterExplore(){
+    ga("explore_mode",{});
     inTour=false; current=-1;
     setCurrentPin(null);
     exitBtn.classList.remove('show');
@@ -627,6 +635,7 @@ var STATE_LABELS=[["AL",32.62,-86.68],["AZ",34.16,-111.93],["CO",39,-105.55],["F
   });
   exitBtn.addEventListener('click', enterExplore);
   document.getElementById('begin-btn').addEventListener('click', function(){
+    ga("tour_start",{});
     titleScreen.classList.add('hidden'); goTo(0);
   });
   document.getElementById('explore-btn').addEventListener('click', function(){
@@ -638,6 +647,10 @@ var STATE_LABELS=[["AL",32.62,-86.68],["AZ",34.16,-111.93],["CO",39,-105.55],["F
     if(e.key==='ArrowRight'){ nextBtn.click(); }
     if(e.key==='ArrowLeft'){ prevBtn.click(); }
   });
+  document.addEventListener('click', function(e){
+    var a=e.target.closest? e.target.closest('.finale-cta a'):null;
+    if(a) ga("finale_cta",{item_name:(a.textContent||'').trim(),link_url:a.href});
+  }, true);
 })();
 </script>
 </body>
